@@ -31,8 +31,13 @@ let catY = 80;
 // Screen space window coordinates
 let currentWinX = 0;
 let currentWinY = 0;
+
+// Target positions for Zoomies
 let targetWinX = 0;
 let targetWinY = 0;
+let isZooming = false;
+let zoomTimer = null;
+const zoomSpeed = 0.12;
 
 // Global cursor coordinates
 let mx = 0;
@@ -46,7 +51,7 @@ let startScreenY = 0;
 let isDrawerOpen = false;
 
 // Physics settings
-const speedFactor = 0.07; // Smooth chasing easing
+const speedFactor = 0.07; // Easing factor
 
 // Typing stats
 let keyTimes = [];
@@ -56,6 +61,7 @@ let typingTimeout = null;
 let pomoTimerId = null;
 let pomoSecondsLeft = 25 * 60;
 let pomoIsRunning = false;
+let pomoActive = false; // Whether the widget is open
 let pomoMode = 'focus'; // focus | break
 
 // Stretch State
@@ -70,6 +76,25 @@ let lastActivityTime = Date.now();
 let isSleeping = false;
 const sleepTimeout = 40000; // 40 seconds of mouse inactivity inside window makes the cat sleep
 
+// --- RANDOM PHRASES ---
+const randomPhrases = [
+  "meow! 🐾",
+  "purr... 😸",
+  "go walk! 🚶",
+  "stand up! 🧘",
+  "take a break! ☕",
+  "drink water! 💧",
+  "feed me! 🐟",
+  "pet me! 👋",
+  "coding time! 💻",
+  "focus! 🎯",
+  "rawr! 🦁",
+  "u got this! ✨",
+  "relax your shoulders! 🧘",
+  "blink your eyes! 👀",
+  "stretching is good! 🤸"
+];
+
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
   // Load saved fur pattern
@@ -81,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (savedNote) {
     pinnedNoteInput.value = savedNote;
     pinnedMessage = savedNote;
-    showSpeech(savedNote, 0); // Pin indefinitely
   }
 
   // Load stretch intervals
@@ -93,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCatElementPos();
   setCatState('breathe');
 
-  // Start smooth physics loop
+  // Start smooth physics update loop
   requestAnimationFrame(physicsLoop);
 });
 
@@ -109,8 +133,6 @@ if (window.electronAPI) {
     if (currentWinX === 0 && currentWinY === 0) {
       currentWinX = data.winX;
       currentWinY = data.winY;
-      targetWinX = data.winX;
-      targetWinY = data.winY;
     }
 
     const newMx = data.mx;
@@ -129,7 +151,6 @@ if (window.electronAPI) {
     // Mathematical Click-Through Evaluation
     let isOverInteractive = false;
     if (isDrawerOpen) {
-      // If configurations are open, keep window completely interactive
       isOverInteractive = true;
     } else {
       const localX = mx - currentWinX;
@@ -171,20 +192,49 @@ if (window.electronAPI) {
   });
 }
 
-// --- SMOOTH 60HZ PHYSICS LOOP ---
+// --- SMOOTH 60HZ UPDATE & PHYSICS LOOP ---
 function physicsLoop() {
+  updateCatElementPos();
+
   if (isDragging) {
-    targetWinX = currentWinX;
-    targetWinY = currentWinY;
     requestAnimationFrame(physicsLoop);
     return;
   }
 
-  if (isStretching || isSleeping || isDrawerOpen) {
-    // Do not chase cursor when settings drawer is open, stretching, or sleeping
-    updateCatElementPos();
-    requestAnimationFrame(physicsLoop);
-    return;
+  // Handle Zoomies movement
+  if (isZooming) {
+    const wdx = targetWinX - currentWinX;
+    const wdy = targetWinY - currentWinY;
+    const dist = Math.hypot(wdx, wdy);
+
+    if (dist > 15) {
+      currentWinX += wdx * zoomSpeed;
+      currentWinY += wdy * zoomSpeed;
+
+      const screenWidth = window.screen.width;
+      const screenHeight = window.screen.height;
+      const currentWinWidth = pomoActive ? 240 : 160;
+      
+      currentWinX = Math.max(0, Math.min(screenWidth - currentWinWidth, currentWinX));
+      currentWinY = Math.max(0, Math.min(screenHeight - 220, currentWinY));
+
+      if (window.electronAPI) {
+        window.electronAPI.moveWindow(currentWinX, currentWinY);
+      }
+
+      // Flip Sprite depending on direction of travel
+      if (wdx < -2) {
+        catContainer.style.transform = 'scaleX(-1)';
+      } else if (wdx > 2) {
+        catContainer.style.transform = 'scaleX(1)';
+      }
+
+      setCatState('walk');
+    } else {
+      isZooming = false;
+      setCatState('breathe');
+      hideSpeech();
+    }
   }
 
   // System Idle Check
@@ -192,50 +242,6 @@ function physicsLoop() {
     goToSleep();
   }
 
-  // Screen space distance from cat center to cursor
-  const cx = currentWinX + catX + 64;
-  const cy = currentWinY + catY + 64;
-
-  const dx = mx - cx;
-  const dy = my - cy;
-  const dist = Math.hypot(dx, dy);
-
-  if (dist > 85) {
-    // Calculate new target window coordinates so cat center tracks the mouse
-    targetWinX = mx - catX - 64;
-    targetWinY = my - catY - 100;
-
-    // Linearly interpolate window positions for 60Hz movement
-    const wdx = targetWinX - currentWinX;
-    const wdy = targetWinY - currentWinY;
-
-    currentWinX += wdx * speedFactor;
-    currentWinY += wdy * speedFactor;
-
-    // Clamp window to desktop borders
-    const screenWidth = window.screen.width;
-    const screenHeight = window.screen.height;
-    currentWinX = Math.max(0, Math.min(screenWidth - 160, currentWinX));
-    currentWinY = Math.max(0, Math.min(screenHeight - 220, currentWinY));
-
-    if (window.electronAPI) {
-      window.electronAPI.moveWindow(currentWinX, currentWinY);
-    }
-
-    // Flip Sprite depending on direction
-    if (dx < -2) {
-      catContainer.style.transform = 'scaleX(-1)';
-    } else if (dx > 2) {
-      catContainer.style.transform = 'scaleX(1)';
-    }
-
-    setCatState('walk');
-  } else {
-    // Close enough -> Idle breathe
-    setCatState('breathe');
-  }
-
-  updateCatElementPos();
   requestAnimationFrame(physicsLoop);
 }
 
@@ -278,18 +284,30 @@ function updateEyeFollow(mx, my) {
   let ty = 0;
 
   if (dist > 5) {
-    // Map pupil translations within a tiny grid (-0.7px to 0.7px)
     tx = (dx / dist) * 0.7;
     ty = (dy / dist) * 0.7;
   }
 
   leftPupil.style.transform = `translate(${tx}px, ${ty}px)`;
   rightPupil.style.transform = `translate(${tx}px, ${ty}px)`;
+
+  // Rotate / tilt head slightly towards mouse
+  const head = document.querySelector('.cat-head');
+  if (head && dist > 15) {
+    const angle = Math.max(-8, Math.min(8, (dx / dist) * 8));
+    head.style.transform = `rotate(${angle}deg)`;
+  }
 }
 
-// --- MOCHI WINDOW DRAGGING & INTERACTIONS ---
+// --- MOCHI DRAGGING & CLICK INTERACTIONS ---
+let clickTimeout = null;
+
 // Double-click cat to toggle console drawer
 catContainer.addEventListener('dblclick', (e) => {
+  if (clickTimeout) {
+    clearTimeout(clickTimeout);
+    clickTimeout = null;
+  }
   toggleDrawer();
 });
 
@@ -298,6 +316,30 @@ catContainer.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   toggleDrawer();
 });
+
+// Single-click cat to show pinned note / reminders
+catContainer.addEventListener('click', (e) => {
+  if (isDragging || e.button !== 0) return;
+  
+  if (clickTimeout) {
+    clearTimeout(clickTimeout);
+    clickTimeout = null;
+  }
+  
+  clickTimeout = setTimeout(() => {
+    handleCatSingleClick();
+    clickTimeout = null;
+  }, 220); // 220ms window to distinguish single vs double click
+});
+
+function handleCatSingleClick() {
+  if (pinnedMessage) {
+    showSpeech(`Reminder: ${pinnedMessage}`, 6000); // Show pinned note for 6 seconds
+  } else {
+    const phrase = randomPhrases[Math.floor(Math.random() * randomPhrases.length)];
+    showSpeech(phrase, 4000);
+  }
+}
 
 catContainer.addEventListener('mousedown', (e) => {
   if (e.button === 0) { // Left click
@@ -334,15 +376,54 @@ window.addEventListener('mouseup', () => {
   if (isDragging) {
     isDragging = false;
     catContainer.classList.remove('cat-drag');
-    
-    // Return to breathing
     setCatState('breathe');
   }
 });
 
+// --- RANDOM BEHAVIORS TIMERS ---
+// Trigger zoomies (runs for a bit)
+function triggerZoomies() {
+  if (isZooming || isDragging || isStretching || isSleeping || isDrawerOpen) return;
+  isZooming = true;
+  
+  const screenWidth = window.screen.width;
+  const screenHeight = window.screen.height;
+  
+  // Choose random coordinates on screen
+  targetWinX = Math.max(50, Math.floor(Math.random() * (screenWidth - 250)));
+  targetWinY = Math.max(50, Math.floor(Math.random() * (screenHeight - 250)));
+
+  showSpeech("ZOOMIES! ⚡", 2500);
+  
+  if (zoomTimer) clearTimeout(zoomTimer);
+  zoomTimer = setTimeout(() => {
+    isZooming = false;
+    setCatState('breathe');
+    hideSpeech();
+  }, 3500);
+}
+
+// Roll for random behavior every 15 seconds to make it more active!
+setInterval(() => {
+  if (isDragging || isStretching || isSleeping || isDrawerOpen || pomoIsRunning || isZooming) return;
+  
+  const roll = Math.random();
+  if (roll < 0.25) {
+    // 25% chance: Zoomies!
+    triggerZoomies();
+  } else if (roll < 0.50) {
+    // 25% chance: Bounces / Hop!
+    triggerJumpReaction();
+  } else if (roll < 0.80) {
+    // 30% chance: Speak a random meow or reminder!
+    const phrase = randomPhrases[Math.floor(Math.random() * randomPhrases.length)];
+    showSpeech(phrase, 4000);
+  }
+  // 20% chance: Stay breathing (do nothing)
+}, 15000);
+
 // --- CAT ANIMATION STATES MANAGER ---
 function setCatState(state) {
-  // Clear other visual classes
   catContainer.classList.remove('cat-breathe', 'cat-walk', 'cat-knead', 'cat-sleep', 'cat-overheat', 'cat-thinking');
   
   if (state === 'breathe') {
@@ -372,12 +453,7 @@ function wakeUp() {
   if (!isSleeping) return;
   isSleeping = false;
   setCatState('breathe');
-  
-  if (pinnedMessage) {
-    showSpeech(pinnedMessage, 0);
-  } else {
-    hideSpeech();
-  }
+  hideSpeech();
 }
 
 // --- SPEECH BUBBLE CONTROL ---
@@ -395,14 +471,13 @@ function showSpeech(text, durationMs = 3000) {
   }
 }
 
+function resetHeadTilt() {
+  const head = document.querySelector('.cat-head');
+  if (head) head.style.transform = 'rotate(0deg)';
+}
+
 function hideSpeech() {
-  // If we have a pinned custom note, restore it instead of hiding
-  if (pinnedMessage && !isSleeping && !isStretching) {
-    bubbleText.innerText = pinnedMessage;
-    speechBubble.classList.remove('hidden');
-  } else {
-    speechBubble.classList.add('hidden');
-  }
+  speechBubble.classList.add('hidden');
 }
 
 // --- CONSOLE/SETTINGS DRAWER CONTROL ---
@@ -411,11 +486,9 @@ function toggleDrawer() {
   
   if (window.electronAPI) {
     if (isDrawerOpen) {
-      // Resize to open dashboard
-      // Horizontal shift: newX = currentWinX - 219 (anchors cat X position)
-      // Vertical shift: newY = currentWinY - 130 (anchors cat Y position)
-      const newWinX = currentWinX - 219;
-      const newWinY = currentWinY - 130;
+      const currentCatX = pomoActive ? 96 : 16;
+      const newWinX = currentWinX - (235 - currentCatX);
+      const newWinY = currentWinY - 130; 
       
       window.electronAPI.moveWindow(newWinX, newWinY);
       window.electronAPI.resizeWindow(380, 360);
@@ -427,28 +500,27 @@ function toggleDrawer() {
 
       settingsDrawer.classList.remove('drawer-closed');
       settingsDrawer.classList.add('drawer-open');
-      
-      // Let console drawer receive clicks naturally
       window.electronAPI.setIgnoreMouseEvents(false);
     } else {
-      // Resize to compact viewport (only the cat)
-      // Horizontal shift: newX = currentWinX + 219
-      // Vertical shift: newY = currentWinY + 130
-      const newWinX = currentWinX + 219;
+      const targetWinWidth = pomoActive ? 240 : 160;
+      const targetCatX = pomoActive ? 96 : 16;
+      
+      const newWinX = currentWinX + (235 - targetCatX);
       const newWinY = currentWinY + 130;
       
-      window.electronAPI.resizeWindow(160, 220);
+      window.electronAPI.resizeWindow(targetWinWidth, 220);
       window.electronAPI.moveWindow(newWinX, newWinY);
       
       currentWinX = newWinX;
       currentWinY = newWinY;
-      catX = 16;
+      catX = targetCatX;
       catY = 80;
 
       settingsDrawer.classList.remove('drawer-open');
       settingsDrawer.classList.add('drawer-closed');
     }
     
+    resetHeadTilt();
     updateCatElementPos();
   }
 }
@@ -496,7 +568,7 @@ pinNoteBtn.addEventListener('click', () => {
   localStorage.setItem('bekkku-note', note);
   
   if (note) {
-    showSpeech(note, 0); 
+    showSpeech(`Pinned: ${note}`, 3000); 
   } else {
     hideSpeech();
   }
@@ -511,10 +583,20 @@ function updatePomoDisplay() {
 
 function startPomo() {
   pomoIsRunning = true;
+  pomoActive = true;
   pomoToggleBtn.innerText = 'PAUSE';
   pomoToggleBtn.classList.remove('btn-green');
   pomoToggleBtn.classList.add('btn-pixel'); 
   pomoWidget.classList.remove('hidden');
+
+  if (window.electronAPI && !isDrawerOpen) {
+    const newWinX = currentWinX - 80;
+    window.electronAPI.moveWindow(newWinX, currentWinY);
+    window.electronAPI.resizeWindow(240, 220);
+    currentWinX = newWinX;
+    catX = 96;
+    updateCatElementPos();
+  }
 
   showSpeech(pomoMode === 'focus' ? "Time to focus! 🍅" : "Take a break! ☕", 3000);
 
@@ -558,11 +640,21 @@ pomoToggleBtn.addEventListener('click', () => {
 
 pomoResetBtn.addEventListener('click', () => {
   pausePomo();
+  pomoActive = false;
   pomoMode = 'focus';
   pomoSecondsLeft = 25 * 60;
   updatePomoDisplay();
   pomoWidget.classList.add('hidden');
   hideSpeech();
+
+  if (window.electronAPI && !isDrawerOpen) {
+    const newWinX = currentWinX + 80;
+    window.electronAPI.resizeWindow(160, 220);
+    window.electronAPI.moveWindow(newWinX, currentWinY);
+    currentWinX = newWinX;
+    catX = 16;
+    updateCatElementPos();
+  }
 });
 
 // --- STRETCH REMINDERS ---

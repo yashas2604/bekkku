@@ -76,12 +76,12 @@ html, body {
 }
 
 /* Let click events bypass the transparent document */
-#app-viewport * {
+#app-viewport {
   pointer-events: none;
 }
 
-/* Re-enable interaction on registered areas */
-.interactive {
+/* Re-enable interaction on registered areas and all their children */
+.interactive, .interactive * {
   pointer-events: auto !important;
 }
 
@@ -517,16 +517,22 @@ textarea:focus {
   animation-delay: 0.3s;
 }
 
-/* Mochi Drag / Stretch */
+/* Mochi Drag / Stretch & Funny Wiggle */
+@keyframes dragWiggle {
+  0% { transform: rotate(-6deg) scaleY(1.32) scaleX(0.85); }
+  100% { transform: rotate(6deg) scaleY(1.32) scaleX(0.85); }
+}
+.cat-drag {
+  animation: dragWiggle 0.08s infinite alternate !important;
+}
 .cat-drag .cat-body {
-  transform: scaleY(1.35) scaleX(0.85);
   transform-origin: bottom;
 }
 .cat-drag .cat-head {
   transform: translateY(-5px);
 }
 .cat-drag .cat-tail {
-  transform: rotate(45deg);
+  transform: rotate(60deg) scale(1.2);
 }
 
 /* Sleeping State */

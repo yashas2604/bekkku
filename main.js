@@ -1,6 +1,11 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu, screen, nativeImage } = require('electron');
 const path = require('path');
 
+// Hide Dock icon on macOS so the window is allowed to float over native full-screen spaces
+if (process.platform === 'darwin') {
+  app.dock.hide();
+}
+
 let mainWindow = null;
 let tray = null;
 let mousePollInterval = null;
@@ -38,6 +43,10 @@ function createWindow() {
 
   // Let the window ignore mouse events by default
   mainWindow.setIgnoreMouseEvents(true, { forward: true });
+
+  // Floating settings: visible on all workspaces (desktops) and screen-saver level always-on-top
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  mainWindow.setAlwaysOnTop(true, 'screen-saver');
 
   // Handle click-through updates from renderer
   ipcMain.on('set-ignore-mouse-events', (event, ignore, options) => {
@@ -109,7 +118,7 @@ function startMousePolling() {
         winHeight: winHeight
       });
     }
-  }, 50); // 20 times per second for smooth chasing
+  }, 50); // 20 times per second for smooth cursor tracking
 }
 
 function createTray() {
@@ -151,7 +160,11 @@ function createTray() {
       checked: true,
       click: (item) => {
         if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.setAlwaysOnTop(item.checked);
+          if (item.checked) {
+            mainWindow.setAlwaysOnTop(true, 'screen-saver');
+          } else {
+            mainWindow.setAlwaysOnTop(false);
+          }
         }
       }
     },
