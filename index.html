@@ -224,14 +224,87 @@
           </div>
         </div>
 
-        <!-- Section: Typing Gym -->
-        <div class="drawer-section">
-          <h3>[ KEYBOARD KNEADING GYM ]</h3>
-          <p class="section-desc">Type fast in the box below to see Bekkku tap along and overheat! 🔥</p>
-          <textarea id="typing-gym-input" placeholder="Start typing here to test WPM and knead..." rows="2"></textarea>
-          <div class="typing-stats">
-            <span>SPEED: <strong id="typing-wpm">0</strong> WPM</span>
-            <span>STATUS: <strong id="knead-status">IDLE</strong></span>
+        <!-- Section: Keyboard Kneading Gym (Monkeytype Style) -->
+        <div class="drawer-section gym-section">
+          <div class="gym-header">
+            <h3>[ KEYBOARD KNEADING GYM ]</h3>
+            <div class="gym-config">
+              <span class="config-opt active" id="config-mode-time" data-mode="time">time</span>
+              <span class="config-opt" id="config-mode-words" data-mode="words">words</span>
+              <span class="config-divider">|</span>
+              <div id="gym-config-options" class="config-options-group">
+                <!-- Populated dynamically via JS -->
+              </div>
+            </div>
+          </div>
+
+          <div class="gym-wrapper interactive" id="gym-wrapper">
+            <!-- Focus overlay -->
+            <div id="gym-focus-overlay" class="gym-overlay">
+              <div class="overlay-content">
+                <span class="focus-icon">⌨️</span>
+                <span class="focus-text">Click to Focus & Knead</span>
+              </div>
+            </div>
+
+            <!-- Hidden input for typing -->
+            <textarea id="gym-hidden-input" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+
+            <!-- Words display area -->
+            <div id="gym-words-container">
+              <div id="gym-words-list">
+                <div id="gym-caret" class="gym-caret"></div>
+                <!-- Words populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Results overlay -->
+            <div id="gym-results" class="gym-results-overlay hidden">
+              <div class="results-title">KNEADING STATS</div>
+              <div class="results-grid">
+                <div class="result-card">
+                  <span class="card-label">wpm</span>
+                  <span class="card-val" id="results-wpm">0</span>
+                </div>
+                <div class="result-card">
+                  <span class="card-label">acc</span>
+                  <span class="card-val" id="results-acc">0%</span>
+                </div>
+                <div class="result-card">
+                  <span class="card-label">time</span>
+                  <span class="card-val" id="results-time">0s</span>
+                </div>
+              </div>
+              <button id="results-restart-btn" class="btn-pixel btn-green">TRY AGAIN</button>
+            </div>
+          </div>
+
+          <div class="gym-footer">
+            <div class="gym-stats-row">
+              <div class="stat-item">
+                <span class="stat-label">WPM:</span>
+                <strong id="gym-wpm-val">0</strong>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">ACC:</span>
+                <strong id="gym-acc-val">100%</strong>
+              </div>
+              <div class="stat-item" id="gym-timer-container">
+                <span id="gym-timer-label" class="stat-label">TIME:</span>
+                <strong id="gym-timer-val">30s</strong>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">STATUS:</span>
+                <strong id="knead-status">IDLE</strong>
+              </div>
+            </div>
+            <div class="gym-actions">
+              <button id="gym-restart-btn" class="btn-pixel-icon" title="Restart (Esc or Tab)">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
