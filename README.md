@@ -62,3 +62,11 @@ Make sure you have [Node.js](https://nodejs.org/) installed.
 - **Cat Engine**: Scalable vector graphics (SVG) with `shape-rendering="crispEdges"` for razor-sharp pixel rendering.
 - **Animations**: CSS Keyframe animations (highly optimized, 0% idle CPU footprint).
 - **Logic**: Vanilla ES6 JavaScript (mouse calculations, physics, timer countdowns, and IPC bridges).
+
+---
+
+## 📄 License & Author
+
+Created with 🐾 by **Yashas M Shetty** ([@yashasmshetty](https://github.com/yashas2604)).
+
+This project is licensed under the [MIT License](LICENSE). Feel free to clone, modify, and build upon it!

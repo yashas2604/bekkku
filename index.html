@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bekkku Desktop Companion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <!-- The main viewport area -->
   <div id="app-viewport">
-    
+
     <!-- Speech bubble / Custom note -->
     <div id="speech-bubble" class="hidden">
       <div class="bubble-content" id="bubble-text">Drink water! 💧</div>
@@ -30,7 +33,7 @@
       <svg id="cat-svg" viewBox="0 0 32 32" width="128" height="128" shape-rendering="crispEdges">
         <!-- Shadow -->
         <ellipse cx="15" cy="27.5" rx="8" ry="1.5" fill="rgba(0,0,0,0.15)" />
-        
+
         <!-- Steam Puffs (Overheat Mode) -->
         <g class="steam-puffs" opacity="0">
           <rect class="steam-1" x="11" y="2" width="2" height="2" fill="#fff" opacity="0.6" />
@@ -61,11 +64,11 @@
           <rect x="8" y="17" width="12" height="9" fill="var(--fur-primary)" />
           <!-- Chest Bib (Secondary color) -->
           <rect x="9" y="19" width="4" height="7" fill="var(--fur-secondary)" />
-          
+
           <!-- Shading -->
           <rect x="8" y="25" width="12" height="1" fill="var(--fur-shadow)" opacity="0.25" />
           <rect x="19" y="17" width="1" height="8" fill="var(--fur-shadow)" opacity="0.25" />
-          
+
           <!-- Patterns / Stripes (Orange Tabby, Calico) -->
           <g class="fur-pattern" opacity="0.4">
             <rect x="12" y="18" width="2" height="1" fill="var(--fur-pattern-color, #000)" />
@@ -104,7 +107,7 @@
           <rect x="5" y="10" width="14" height="7" fill="var(--fur-primary)" />
           <!-- Head Shadow -->
           <rect x="5" y="16" width="14" height="1" fill="var(--fur-shadow)" opacity="0.25" />
-          
+
           <!-- Face Markings / Patches (Siamese / Calico) -->
           <g class="face-pattern" opacity="0.3">
             <rect x="10" y="12" width="4" height="5" fill="var(--fur-pattern-color, #000)" />
@@ -148,7 +151,7 @@
       </div>
 
       <div class="drawer-body">
-        
+
         <!-- Section: Fur Selector -->
         <div class="drawer-section">
           <h3>[ SELECT FUR ]</h3>
@@ -192,7 +195,7 @@
         <!-- Section: Timer Toggles -->
         <div class="drawer-section">
           <h3>[ TIMER SETTINGS ]</h3>
-          
+
           <!-- Pomodoro Control -->
           <div class="timer-control pomo-control">
             <div class="timer-label">🍅 POMODORO:</div>
@@ -300,8 +303,9 @@
             </div>
             <div class="gym-actions">
               <button id="gym-restart-btn" class="btn-pixel-icon" title="Restart (Esc or Tab)">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                 </svg>
               </button>
             </div>
@@ -314,6 +318,12 @@
           <button id="minimize-drawer-btn" class="btn-pixel">CLOSE</button>
         </div>
 
+        <!-- Author Attribution -->
+        <div class="drawer-attribution"
+          style="text-align: center; font-size: 8px; color: var(--text-muted); margin-top: 10px; font-family: 'JetBrains Mono', monospace; opacity: 0.7;">
+          MADE BY @YASHAS M SHETTY 🐾
+        </div>
+
       </div>
     </div>
 
@@ -321,4 +331,5 @@
 
   <script src="renderer.js"></script>
 </body>
+
 </html>

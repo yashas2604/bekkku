@@ -3,6 +3,15 @@
   "version": "1.0.0",
   "description": "A retro pixel cat companion that lives on your desktop",
   "main": "main.js",
+  "author": {
+    "name": "Yashas M Shetty",
+    "url": "https://github.com/yashas2604"
+  },
+  "homepage": "https://github.com/yashas2604/bekkku",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yashas2604/bekkku.git"
+  },
   "scripts": {
     "start": "electron ."
   },
