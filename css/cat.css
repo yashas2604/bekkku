@@ -1,0 +1,158 @@
+/* --- KEYFRAME ANIMATIONS --- */
+
+/* Breathing */
+@keyframes breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(0.75px); }
+}
+.cat-breathe .cat-head {
+  animation: breathe 3s ease-in-out infinite;
+}
+.cat-breathe .cat-body {
+  animation: breathe 3s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+
+/* Tail Wagging */
+@keyframes tailWag {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+}
+.cat-breathe .cat-tail {
+  animation: tailWag 2.5s ease-in-out infinite;
+}
+
+/* Walking */
+@keyframes walkLeftPaw {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes walkRightPaw {
+  0%, 100% { transform: translateY(-3px); }
+  50% { transform: translateY(0); }
+}
+@keyframes walkBodyBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+@keyframes walkTailWiggle {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(12deg); }
+}
+
+.cat-walk .cat-paw-left {
+  animation: walkLeftPaw 0.25s steps(2) infinite;
+}
+.cat-walk .cat-paw-right {
+  animation: walkRightPaw 0.25s steps(2) infinite;
+}
+.cat-walk .cat-body, .cat-walk .cat-head {
+  animation: walkBodyBounce 0.25s steps(2) infinite;
+}
+.cat-walk .cat-tail {
+  animation: walkTailWiggle 0.25s steps(2) infinite;
+}
+
+/* Kneading (Typing) */
+@keyframes kneadLeft {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.4) translateY(3px); }
+}
+@keyframes kneadRight {
+  0%, 100% { transform: scaleY(0.4) translateY(3px); }
+  50% { transform: scaleY(1); }
+}
+.cat-knead .cat-paw-left {
+  animation: kneadLeft 0.12s steps(2) infinite;
+}
+.cat-knead .cat-paw-right {
+  animation: kneadRight 0.12s steps(2) infinite;
+}
+.cat-knead .cat-head {
+  animation: breathe 0.6s ease-in-out infinite;
+}
+
+/* Overheat Mode */
+.cat-overheat #cat-svg-original, .cat-overheat #cat-svg-outlined {
+  filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.7)) sepia(0.3) saturate(1.5) hue-rotate(-20deg);
+}
+@keyframes steamVent {
+  0% { transform: translateY(2px) scale(0.6); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateY(-10px) scale(1.3); opacity: 0; }
+}
+.cat-overheat .steam-puffs {
+  opacity: 1 !important;
+}
+.cat-overheat .steam-1 {
+  animation: steamVent 1s infinite linear;
+}
+.cat-overheat .steam-2 {
+  animation: steamVent 1.2s infinite linear;
+  animation-delay: 0.3s;
+}
+
+/* Mochi Drag / Stretch & Wiggle */
+@keyframes dragWiggle {
+  0% { transform: rotate(-6deg) scaleY(1.32) scaleX(0.85); }
+  100% { transform: rotate(6deg) scaleY(1.32) scaleX(0.85); }
+}
+.cat-drag {
+  animation: dragWiggle 0.08s infinite alternate !important;
+}
+.cat-drag .cat-body {
+  transform-origin: bottom;
+}
+.cat-drag .cat-head {
+  transform: translateY(-5px);
+}
+.cat-drag .cat-tail {
+  transform: rotate(60deg) scale(1.2);
+}
+
+/* Sleeping State */
+.cat-sleep .cat-head {
+  transform: translateY(2.5px);
+  animation: breathe 5s ease-in-out infinite;
+}
+.cat-sleep .cat-body {
+  transform: translateY(1px);
+  animation: breathe 5s ease-in-out infinite;
+  animation-delay: 0.25s;
+}
+.cat-sleep .pupil {
+  display: none !important;
+}
+.cat-sleep .eye-white {
+  fill: var(--fur-primary) !important;
+  opacity: 0.7;
+}
+
+/* AI Thinking Dots Bouncing */
+@keyframes thinkDot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+.cat-thinking .thinking-dots {
+  opacity: 1 !important;
+}
+.cat-thinking .dot-1 { animation: thinkDot 0.6s infinite; }
+.cat-thinking .dot-2 { animation: thinkDot 0.6s infinite; animation-delay: 0.2s; }
+.cat-thinking .dot-3 { animation: thinkDot 0.6s infinite; animation-delay: 0.4s; }
+
+/* Jump / Done Hop */
+@keyframes happyJump {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  35% { transform: translateY(-30px) scaleY(1.1); }
+  45% { transform: translateY(-30px) scaleY(1.1); }
+  70% { transform: translateY(0) scaleY(0.85); }
+}
+.cat-jump {
+  animation: happyJump 0.75s ease-out;
+}
+
+/* Speech Bubble Floating Bubble Animation */
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}

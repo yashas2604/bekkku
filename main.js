@@ -63,7 +63,7 @@ function createWindow() {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win && !win.isDestroyed()) {
       const [wx, wy] = win.getPosition();
-      win.setPosition(wx + dx, wy + dy);
+      win.setPosition(Math.round(wx + dx), Math.round(wy + dy));
     }
   });
 

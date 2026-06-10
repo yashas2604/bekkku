@@ -1,0 +1,120 @@
+/* --- RETRO COMPUTER DESIGN SYSTEM --- */
+.hidden {
+  display: none !important;
+}
+:root {
+  /* Default Ginger Tabby Palette */
+  --fur-primary: #d37c35;
+  --fur-secondary: #fceeda;
+  --fur-shadow: #a05621;
+  --fur-pattern-color: #7f3d0e;
+  --eye-color: #4baf4f;
+  --ear-inner: #fca5a5;
+  
+  /* Console colors */
+  --bg-console: rgba(12, 12, 14, 0.95);
+  --border-pixel: #3f3f46;
+  --border-pixel-active: #a1a1aa;
+  --text-green: #22c55e;
+  --text-green-dim: #15803d;
+  --text-primary: #e4e4e7;
+  --text-muted: #71717a;
+}
+
+/* --- THEMES --- */
+.tuxedo-cat {
+  --fur-primary: #22252a;
+  --fur-secondary: #ffffff;
+  --fur-shadow: #121316;
+  --fur-pattern-color: transparent;
+  --eye-color: #eab308;
+}
+.calico-cat {
+  --fur-primary: #ffffff;
+  --fur-secondary: #f97316;
+  --fur-shadow: #d4d4d8;
+  --fur-pattern-color: #27272a;
+  --eye-color: #14b8a6;
+}
+.siamese-cat {
+  --fur-primary: #ebdcb9;
+  --fur-secondary: #451a03;
+  --fur-shadow: #d6c39a;
+  --fur-pattern-color: #451a03;
+  --eye-color: #3b82f6;
+}
+.midnight-cat {
+  --fur-primary: #18181b;
+  --fur-secondary: #27272a;
+  --fur-shadow: #09090b;
+  --fur-pattern-color: transparent;
+  --eye-color: #f59e0b;
+}
+.ghost-cat {
+  --fur-primary: #f8fafc;
+  --fur-secondary: #e2e8f0;
+  --fur-shadow: #cbd5e1;
+  --fur-pattern-color: transparent;
+  --eye-color: #db2777;
+}
+
+/* --- SVG PIXEL ART THEME RULES --- */
+/* Hide all special patterns by default */
+.white-muzzle, .siamese-mask, .calico-patches {
+  display: none !important;
+}
+
+/* Default cat (Orange/Ginger) setup */
+.white-muzzle {
+  display: block !important; /* Orange has white snout */
+}
+
+/* Tuxedo Cat setup */
+.tuxedo-cat .white-muzzle {
+  display: block !important;
+}
+
+/* Calico Cat setup */
+.calico-cat .white-muzzle {
+  display: block !important;
+}
+.calico-cat .calico-patches {
+  display: block !important;
+}
+.calico-cat .left-ear-fur {
+  fill: var(--fur-secondary) !important; /* Orange left ear */
+}
+.calico-cat .right-ear-fur {
+  fill: var(--fur-pattern-color) !important; /* Grey right ear */
+}
+.calico-cat .left-paw-fur {
+  fill: var(--fur-pattern-color) !important; /* Grey left limb */
+}
+.calico-cat .right-paw-fur {
+  fill: var(--fur-secondary) !important; /* Orange right limb */
+}
+.calico-cat .tail-fur {
+  fill: var(--fur-pattern-color) !important; /* Grey tail */
+}
+
+/* Siamese Cat setup */
+.siamese-cat .siamese-mask {
+  display: block !important;
+}
+.siamese-cat .left-ear-fur, .siamese-cat .right-ear-fur {
+  fill: var(--fur-pattern-color) !important; /* Dark brown ears */
+}
+.siamese-cat .left-paw-fur, .siamese-cat .right-paw-fur {
+  fill: var(--fur-pattern-color) !important; /* Dark brown paws */
+}
+
+/* Ghost Cat setup */
+.ghost-cat .white-muzzle {
+  display: block !important;
+}
+.ghost-cat .left-eye-color {
+  fill: #f59e0b !important; /* Yellow left eye */
+}
+.ghost-cat .right-eye-color {
+  fill: #3b82f6 !important; /* Blue right eye */
+}
