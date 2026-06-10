@@ -1,4 +1,7 @@
 /* --- RETRO COMPUTER DESIGN SYSTEM --- */
+.hidden {
+  display: none !important;
+}
 :root {
   /* Default Ginger Tabby Palette */
   --fur-primary: #d37c35;
@@ -53,6 +56,67 @@
   --fur-shadow: #cbd5e1;
   --fur-pattern-color: transparent;
   --eye-color: #db2777;
+}
+
+/* --- SVG PIXEL ART THEME RULES --- */
+/* Hide all special patterns by default */
+.white-muzzle, .siamese-mask, .calico-patches {
+  display: none !important;
+}
+
+/* Default cat (Orange/Ginger) setup */
+.white-muzzle {
+  display: block !important; /* Orange has white snout */
+}
+
+/* Tuxedo Cat setup */
+.tuxedo-cat .white-muzzle {
+  display: block !important;
+}
+
+/* Calico Cat setup */
+.calico-cat .white-muzzle {
+  display: block !important;
+}
+.calico-cat .calico-patches {
+  display: block !important;
+}
+.calico-cat .left-ear-fur {
+  fill: var(--fur-secondary) !important; /* Orange left ear */
+}
+.calico-cat .right-ear-fur {
+  fill: var(--fur-pattern-color) !important; /* Grey right ear */
+}
+.calico-cat .left-paw-fur {
+  fill: var(--fur-pattern-color) !important; /* Grey left limb */
+}
+.calico-cat .right-paw-fur {
+  fill: var(--fur-secondary) !important; /* Orange right limb */
+}
+.calico-cat .tail-fur {
+  fill: var(--fur-pattern-color) !important; /* Grey tail */
+}
+
+/* Siamese Cat setup */
+.siamese-cat .siamese-mask {
+  display: block !important;
+}
+.siamese-cat .left-ear-fur, .siamese-cat .right-ear-fur {
+  fill: var(--fur-pattern-color) !important; /* Dark brown ears */
+}
+.siamese-cat .left-paw-fur, .siamese-cat .right-paw-fur {
+  fill: var(--fur-pattern-color) !important; /* Dark brown paws */
+}
+
+/* Ghost Cat setup */
+.ghost-cat .white-muzzle {
+  display: block !important;
+}
+.ghost-cat .left-eye-color {
+  fill: #f59e0b !important; /* Yellow left eye */
+}
+.ghost-cat .right-eye-color {
+  fill: #3b82f6 !important; /* Blue right eye */
 }
 
 /* --- GENERAL WINDOW & VIEWPORT --- */

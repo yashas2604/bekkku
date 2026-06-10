@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, Tray, Menu, screen, nativeImage } = require('electron');
 const path = require('path');
+const os = require('os');
 
 // Hide Dock icon on macOS so the window is allowed to float over native full-screen spaces
 if (process.platform === 'darwin') {
@@ -90,6 +91,20 @@ function createWindow() {
       const [ww, wh] = mainWindow.getSize();
       mainWindow.setPosition(sw - ww - 50, sh - wh - 50);
     }
+  });
+
+  // Handle retrieving OS username
+  ipcMain.handle('get-os-username', () => {
+    try {
+      const username = os.userInfo().username;
+      if (username) {
+        // Clean and capitalize the username (e.g. yashasmshetty -> Yashasmshetty)
+        return username.charAt(0).toUpperCase() + username.slice(1);
+      }
+    } catch (e) {
+      console.error('Failed to get OS username:', e);
+    }
+    return '';
   });
 
   mainWindow.on('closed', () => {

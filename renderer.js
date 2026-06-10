@@ -11,6 +11,9 @@ const minimizeDrawerBtn = document.getElementById('minimize-drawer-btn');
 
 // Controls & Inputs
 const furBtns = document.querySelectorAll('.fur-btn');
+const usernameInput = document.getElementById('username-input');
+const saveUsernameBtn = document.getElementById('save-username-btn');
+const styleSelect = document.getElementById('style-select');
 const pinnedNoteInput = document.getElementById('pinned-note-input');
 const pinNoteBtn = document.getElementById('pin-note-btn');
 const pomoToggleBtn = document.getElementById('pomo-toggle-btn');
@@ -136,8 +139,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize keyboard kneading gym
   initGym();
 
+  // Load saved username
+  const savedUsername = localStorage.getItem('bekkku-username') || '';
+  if (savedUsername) {
+    usernameInput.value = savedUsername;
+  }
+
+  // Load saved style
+  const savedStyle = localStorage.getItem('bekkku-style') || 'outlined';
+  styleSelect.value = savedStyle;
+  setCatStyle(savedStyle);
+
+  styleSelect.addEventListener('change', (e) => {
+    setCatStyle(e.target.value);
+  });
+
   // Start smooth physics update loop
   requestAnimationFrame(physicsLoop);
+
+  // Show startup greeting
+  showStartupGreeting();
 });
 
 // --- ELECTRON IPC TRAY INTEGRATION ---
@@ -283,17 +304,24 @@ function updateCatElementPos() {
   }
 }
 
-// --- DYNAMIC EYE-FOLLOWING ---
 function updateEyeFollow(mx, my) {
   if (isSleeping) return;
 
-  const leftPupil = document.querySelector('.cat-eye-left .pupil');
-  const rightPupil = document.querySelector('.cat-eye-right .pupil');
+  const activeStyle = localStorage.getItem('bekkku-style') || 'outlined';
+  const activeSvgId = activeStyle === 'original' ? 'cat-svg-original' : 'cat-svg-outlined';
+  const activeSvg = document.getElementById(activeSvgId);
+  if (!activeSvg) return;
+
+  const leftPupil = activeSvg.querySelector('.cat-eye-left .pupil');
+  const rightPupil = activeSvg.querySelector('.cat-eye-right .pupil');
   if (!leftPupil || !rightPupil) return;
 
-  // Center of cat face in screen space
-  const faceX = currentWinX + catX + (128 * 11 / 32);
-  const faceY = currentWinY + catY + (128 * 13 / 32);
+  // Center of cat face in screen space depending on chosen style
+  const centerX = activeStyle === 'original' ? 11 : 15.5;
+  const centerY = activeStyle === 'original' ? 13 : 14;
+
+  const faceX = currentWinX + catX + (128 * centerX / 32);
+  const faceY = currentWinY + catY + (128 * centerY / 32);
 
   const dx = mx - faceX;
   const dy = my - faceY;
@@ -311,11 +339,28 @@ function updateEyeFollow(mx, my) {
   rightPupil.style.transform = `translate(${tx}px, ${ty}px)`;
 
   // Rotate / tilt head slightly towards mouse
-  const head = document.querySelector('.cat-head');
+  const head = activeSvg.querySelector('.cat-head');
   if (head && dist > 15) {
     const angle = Math.max(-8, Math.min(8, (dx / dist) * 8));
     head.style.transform = `rotate(${angle}deg)`;
   }
+}
+
+function setCatStyle(style) {
+  const originalSvg = document.getElementById('cat-svg-original');
+  const outlinedSvg = document.getElementById('cat-svg-outlined');
+  
+  if (originalSvg && outlinedSvg) {
+    if (style === 'original') {
+      originalSvg.classList.remove('hidden');
+      outlinedSvg.classList.add('hidden');
+    } else {
+      originalSvg.classList.add('hidden');
+      outlinedSvg.classList.remove('hidden');
+    }
+  }
+  
+  localStorage.setItem('bekkku-style', style);
 }
 
 // --- MOCHI DRAGGING & CLICK INTERACTIONS ---
@@ -580,6 +625,17 @@ furBtns.forEach(btn => {
   });
 });
 
+// --- USERNAME CUSTOMIZER ---
+saveUsernameBtn.addEventListener('click', () => {
+  const name = usernameInput.value.trim();
+  localStorage.setItem('bekkku-username', name);
+  if (name) {
+    showSpeech(`Saved: ${name}! 🐾`, 3000);
+  } else {
+    showSpeech("Name cleared! 🐾", 3000);
+  }
+});
+
 // --- PINNING NOTES ---
 pinNoteBtn.addEventListener('click', () => {
   const note = pinnedNoteInput.value.trim();
@@ -720,17 +776,55 @@ aiThinkBtn.addEventListener('click', () => {
   }, 4000);
 });
 
-function triggerJumpReaction() {
+function triggerJumpReaction(customText, durationMs = 3000) {
   catContainer.classList.add('cat-jump');
-  showSpeech("YEAH ! 🎉", 3000);
+  const textToShow = customText !== undefined ? customText : "YEAH ! 🎉";
+  if (textToShow) {
+    showSpeech(textToShow, durationMs);
+  }
 
   setTimeout(() => {
     catContainer.classList.remove('cat-jump');
-    hideSpeech();
+    if (textToShow && durationMs <= 800) {
+      hideSpeech();
+    }
   }, 800);
 }
 
-aiDoneBtn.addEventListener('click', triggerJumpReaction);
+async function showStartupGreeting() {
+  let name = localStorage.getItem('bekkku-username') || '';
+  if (!name && window.electronAPI) {
+    name = await window.electronAPI.getOSUsername();
+  }
+
+  let welcomeText = "Hi";
+  if (name) {
+    welcomeText += ` ${name}`;
+  } else {
+    welcomeText += " there";
+  }
+  welcomeText += "! 🐾";
+
+  const hour = new Date().getHours();
+  let timeGreeting = "";
+  if (hour < 12) {
+    timeGreeting = "Good morning! ☀️";
+  } else if (hour < 18) {
+    timeGreeting = "Good afternoon! 🌤️";
+  } else {
+    timeGreeting = "Good evening! 🌙";
+  }
+
+  // 1. First message: "Hi [Name]! 🐾" with a welcome jump
+  triggerJumpReaction(welcomeText, 2500);
+
+  // 2. Second message: "Good morning/afternoon/evening!" shown after a short pause
+  setTimeout(() => {
+    showSpeech(timeGreeting, 3500);
+  }, 2850);
+}
+
+aiDoneBtn.addEventListener('click', () => triggerJumpReaction());
 
 // --- KEYBOARD KNEADING GYM (MONKEYTYPE STYLE) ---
 const typingWordsList = [

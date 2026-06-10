@@ -16,6 +16,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   resetPosition: () => {
     ipcRenderer.send('reset-position');
   },
+  getOSUsername: () => {
+    return ipcRenderer.invoke('get-os-username');
+  },
   onToggleSettings: (callback) => {
     ipcRenderer.on('toggle-settings', (_event, value) => callback(value));
   },
